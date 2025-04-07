@@ -1,0 +1,14 @@
+# .gitignore
+__pycache__
+
+# do not track any previously created blueprints
+Blueprint Out/*
+
+# All images other than the sample one
+image/*
+!image/Crusher/*
+!image/Output/*
+!image/Run/*
+!image/Sample.jpg
+
+image_crusher_alt.py

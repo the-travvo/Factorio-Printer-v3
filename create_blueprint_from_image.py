@@ -8,7 +8,7 @@ metric = ['Non-Euclidean']
 
 # add an icon to the image (normal = no icon added)
 # ['legendary', 'epic', 'rare', 'uncommon', 'normal', 'all']
-qual = ['all']
+qual = ['legendary']
 
 # im_crop = (0, 0, 1000, 1000) left, upper, right, lower pixel coords to crop.
 #    cropping happens before image edit
@@ -21,10 +21,10 @@ im_crop = None
 im_scale = ['fit']
 
 # im_color: 0.0 is grayscale, 1.0 is normal color, > 1.0 increases saturation
-im_color = 1.3
+im_color = 1.0
 
 # im_contrast: 0.0 is flat gray, 1.0 is normal, > 1.0 increases contrast
-im_contrast = 1.5
+im_contrast = 1.0
 
 # im_brightness: 0.0 is black, 1.0 is normal, > 1.0 increases brightness
 im_brightness = 1.0

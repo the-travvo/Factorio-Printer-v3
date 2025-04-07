@@ -7,11 +7,11 @@ This printer can create images of up to 3000 x 720 = 2.16 million pixels, with e
 
 The minimum needed to get the printer working:
 
-* Make sure you have installed all the dependencies laid out in the **Requirements** section
+* Make sure you have installed all the dependencies laid out in the [Requirements](#requirements) section
 * Clone the repository into a local directory on your machine
 * Use Python to run the script called create_blueprint_from_image.py
 * Add the Factorio_Printer_v3.0 save file to your local saves, and open it in Factorio
-* Follow the instructions in the **In Game** section below
+* Follow the instructions in the [In Game](#in-game) section below
 
 ## Requirements
 
@@ -145,6 +145,17 @@ From here, I chose a black (black refined concrete) and white (space science pac
 
 The palette items and the adjusted color values I use for them are viewable in `dat/Final_Palette.csv`.
 
+Here is the sample image included in the git repository:
+
+![Charles and Brigger](./image/Sample.jpg)
+
+This image was run with `create_factorio_blueprint_from_image(dither_method = 'Blue Noise')` :
+
+![Charles and Brigger](./dat/images/sample_print.jpg)
+
+Noticeably washed out. Here's the same image, run with `create_factorio_blueprint_from_image(dither_method = 'Blue Noise', image_color = 1.3, image_contrast = 1.5)`:
+
+![Charles and Brigger](./dat/images/sample_print_saturated.jpg)
 
 ### Non-square pixels
 

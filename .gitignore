@@ -3,6 +3,7 @@ __pycache__
 
 # do not track any previously created blueprints
 Blueprint Out/*
+!Blueprint Out/BP_29_Sample_Blue Noise.txt
 
 # All images other than the sample one
 image/*

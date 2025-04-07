@@ -5,11 +5,4 @@ __pycache__
 Blueprint Out/*
 !Blueprint Out/BP_29_Sample_Blue Noise.txt
 
-# All images other than the sample one
-image/*
-!image/Crusher/*
-!image/Output/*
-!image/Run/*
-!image/Sample.jpg
-
 image_crusher_alt.py

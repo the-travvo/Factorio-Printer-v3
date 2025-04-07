@@ -383,6 +383,9 @@ def create_im_samples(
     if 'Euc_Dict' not in globals():
         build_pal_dict(palette)
     
+    out_images = os.listdir('image/Output')
+    out_images.remove('.gitignore')
+
     for out_image in os.listdir('image/Output'):
         os.unlink('image/Output/' + out_image)
 

@@ -5,24 +5,15 @@ This printer can create images of up to 3000 x 720 = 2.16 million pixels, with e
 
 ## Minimum Working Example
 
-The minimum needed to get the printer working:
-
-* Make sure you have installed all the dependencies laid out in the [Requirements](#requirements) section
-* Clone the repository into a local directory on your machine
-* Use Python to run the script called create_blueprint_from_image.py
-* Add the Factorio_Printer_v3.0 save file to your local saves, and open it in Factorio
-* Follow the instructions in the [In Game](#in-game) section below
+See the [Quickstart Guide](QUICKSTART.md)
 
 ## Requirements
 
 * python 3.12
 * python libraries:
-  * os
+  * os, base64, json, zlib (included with python)
   * numpy
   * pandas
-  * zlib
-  * base64
-  * json
   * luadata
   * pillow (PIL fork)
 * Factorio 2.0

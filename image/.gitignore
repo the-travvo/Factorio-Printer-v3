@@ -4,3 +4,4 @@
 # except this file and the sample image
 !.gitignore
 !Sample.jpg
+!Test_palette.png

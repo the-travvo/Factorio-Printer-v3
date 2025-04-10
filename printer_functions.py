@@ -386,7 +386,7 @@ def create_im_samples(
     out_images = os.listdir('image/Output')
     out_images.remove('.gitignore')
 
-    for out_image in os.listdir('image/Output'):
+    for out_image in out_images:
         os.unlink('image/Output/' + out_image)
 
     x_dim = im.size[0]

@@ -1,4 +1,4 @@
-# Quickstart Guide
+# Factorio Printer Quickstart Guide
 
 Here's what you need to get the printer working ASAP:
 
@@ -17,7 +17,7 @@ Here's what you need to get the printer working ASAP:
 
 * python 3.12
 * python libraries:
-  * os, base64, json, zlib (included with python)
+  * os, base64, json, zlib, enum (included with python)
   * numpy
   * pandas
   * luadata
@@ -26,10 +26,9 @@ Here's what you need to get the printer working ASAP:
 * Factorio Space Age DLC (requires all three SA mods)
 * Factorio Mods:
   * Editor Extensions [LINK](https://mods.factorio.com/mod/EditorExtensions)
-  * Color Coding [LINK](https://mods.factorio.com/mod/color-coding)
+  * Technicolor Lab Tiles [LINK](https://mods.factorio.com/mod/tech-tiles)
   * Pushbutton [LINK](https://mods.factorio.com/mod/pushbutton)
-  * Whats a Spoilage [LINK](https://mods.factorio.com/mod/whats_a_spoilage)
-* the Factorio_Printer_v3.0 save file added to your local save directory. 
+* the Factorio_Printer_v3.1 save file added to your local save directory. 
 
 
 ## Adding the Factorio Printer to your saves
@@ -48,7 +47,7 @@ In Linux, your Factorio save files can be found by:
 
 1. Open the Factorio_Printer_3.0 save in Factorio, with the required mods. Your default save location in windows can be found by navigating to `%appdata%` and from there opening `./Factorio/saves/` folder. On Linux, `~/.factorio/saves/`
 
-2. Open your map (default `m`) and zoom out until you can see the entire structure of the printer. You should see a box on the center left with "1: LOAD BP" written. Zoom in on the box and bank of combinators, but not so far that you leave map view.
+2. Open your map (default `m`) and zoom out until you can see the entire structure of the printer. You should see a box on the center left with "LOAD" written. Zoom in on the box and bank of combinators, but not so far that you leave map view.
 
 ![](./dat/images/bp_load_1.jpg)
 
@@ -58,10 +57,12 @@ In Linux, your Factorio save files can be found by:
 
 ![](./dat/images/bp_load_2.jpg)
 
-5. Move to the right until you see the outlined box that says '2: PUSH TO PRINT', and zoom in so that you can see the entities. Click the combinator, and click `On`. This is a pushbutton combinator, so it will immediately switch back off.
-
-![](./dat/images/bp_load_3.jpg)
+5. Move to the right, and zoom in to the center of the Star under 'Run', and click the pushbutton combinator and click 'on' (since it is a pushbutton, it will immediately turn back off)
 
 6. Exit the GUI for the combinator, and move to the right. The printer is now printing. If you leave map view, the in-person view is centered over a target shaped tag that corresponds to the approximate center of the image. You can see more of the image from in-person view, however the more of the print you are watching, the slower it will go. Each inserter is responsible for 600 pixels, and they move every 10 ticks, so this works out to 600 * (10 / 60) = 100 seconds of activity per inserter. Overall, a print should take ~120 seconds to finish, provided the game can run at 60 UPS.
 
-7. Making sure the in-person view is centered on the target, open the console with `~`, and run `/screenshot 6050 2925 0.25`. This will create a JPG screenshot of the image, which will get put into `script-output/` inside your Factorio folder.
+Here is a .gif of steps 1-6 (in-game):
+
+![](./dat/images/printer_operation.gif)
+
+7. Making sure the in-person view is centered on the target tag on the map, open the console with `~`, and run `/screenshot 6050 2925 0.25`. This will create a JPG screenshot of the image, which will get put into `script-output/` inside your Factorio folder.

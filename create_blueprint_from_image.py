@@ -1,24 +1,24 @@
 import printer_functions as pfns
+from printer_functions import Dither_Method, Quality, Image_Scale
 
-# ["Blue Noise", "Error Diffusion", "Tetrahedral", "Cubic", "Octahedral", "Dodecahedral", "Nearest Color"]
-dither = ["Blue Noise"]
 
-# ['Euclidean', 'Non-Euclidean']
-metric = ['Non-Euclidean']
+# dither = [Dither_Method.BLUE_NOISE, Dither_Method.ERR_DIFF_PER, Dither_Method.POLY_4, Dither_Method.POLY_6, Dither_Method.POLY_8, Dither_Method.POLY_12, Dither_Method.NEAREST]
+dither = Dither_Method.BLUE_NOISE
 
 # add an icon to the image (normal = no icon added)
-# ['legendary', 'epic', 'rare', 'uncommon', 'normal', 'all']
-qual = ['legendary']
+# [Quality.LEGENDARY, Quality.EPIC, Quality.RARE, Quality.UNCOMMON, Quality.NORMAL, Quality.ALL]
+qual = Quality.LEGENDARY
 
 # im_crop = (0, 0, 1000, 1000) left, upper, right, lower pixel coords to crop.
 #    cropping happens before image edit
 
 im_crop = None
 
-# im_scale = ["fit" - scale image to fit within frame, as large as possible, 
-#               "center" - keep original size, cropping if necessary to fit, 
-#               "x2 center" - first double size, then crop if necessary to fit]
-im_scale = ['fit']
+# im_scale = [Image_Scale.FIT - scale image to fit within frame, as large as possible, 
+#               Image_Scale.CENTER - keep original size, cropping if necessary to fit, 
+#               Image_Scale.X2_CENTER - first double size, then crop if necessary to fit,
+#               Image_Scale.INT_SCALE - (not built) scale ]
+im_scale = Image_Scale.FIT
 
 # im_color: 0.0 is grayscale, 1.0 is normal color, > 1.0 increases saturation
 im_color = 1.0
@@ -34,8 +34,7 @@ im_sharpness = 1.0
 
 
 
-pfns.create_factorio_blueprint_from_image(dither_method = dither, 
-                                          closeness_metric = metric, 
+pfns.create_factorio_printer_image(dither_method = dither, 
                                           quality_icon = qual, 
                                           image_crop = im_crop, 
                                           image_scale = im_scale,

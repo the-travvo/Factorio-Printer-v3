@@ -3,7 +3,7 @@ __pycache__
 
 # do not track any previously created blueprints
 Blueprint Out/*
-!Blueprint Out/BP_29_Sample_Blue Noise.txt
+!Blueprint Out/BP_1_Sample_BLUE_NOISE.txt
 
 image_crusher_alt.py
 palette_works.py

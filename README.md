@@ -1,17 +1,25 @@
-# Factorio Printer v3.0
+# Factorio Printer v3.1
 The purpose of this project is to take an input image and recreate it within the game Factorio, displayed as items arranged on belts to form the pixels. This is accomplished with python scripts which process the image and export a .txt file with the blueprint string, ready to be dragged and dropped into the Factorio game window. This is a sequel to [Color Image Printer, 480 x 180 pixels](https://www.reddit.com/r/factorio/comments/r0itzg/color_image_printer_480_x_180_pixels/).
 
-This printer can create images of up to 3000 x 720 = 2.16 million pixels, with each pixel a stack of four items, totalling 8.64 million items.
+This printer can create images of up to 3000 x 720 = 2.16 million pixels, with each pixel a stack of four items, totalling 8.64 million items. Here is a screenshot taken in-game of a print:
+
+![](dat/images/printer_example.jpg)
+
+Version 3.1 of the printer has been updated to use items from a mod that I made, [Technicolor Lab Tiles](https://mods.factorio.com/mod/tech-tiles). This allows precise color output, and greatly simplifies nearest-color algorithms. See the [Quickstart Guide for the Factorio Printer](QUICKSTART_printer.md).
+
+In addition, 3.1 contains a new script which creates images as placeable tile mosaics, rather than by printing in the printer. All this requires is the Technicolor Lab Tiles mod, meaning you can use this script and mod to print images on the ground in any existing game. Here is an example tile mosaic:
+
+![](dat/images/tile_mosaic_example.jpg)
 
 ## Minimum Working Example
 
-See the [Quickstart Guide](QUICKSTART.md)
+See the [Quickstart Guide for the Printer](QUICKSTART_printer.md), or the [Quickstart Guide for the Tile Mosaic Maker](QUICKSTART_tile_mosaic.md)
 
 ## Requirements
 
 * python 3.12
 * python libraries:
-  * os, base64, json, zlib (included with python)
+  * os, base64, json, zlib, enum (included with python)
   * numpy
   * pandas
   * luadata
@@ -19,59 +27,49 @@ See the [Quickstart Guide](QUICKSTART.md)
 * Factorio 2.0
 * Factorio Space Age DLC (requires all three SA mods)
 * Factorio Mods:
+  * Technicolor Lab Tiles [LINK](https://mods.factorio.com/mod/tech-tiles)
   * Editor Extensions [LINK](https://mods.factorio.com/mod/EditorExtensions)
-  * Color Coding [LINK](https://mods.factorio.com/mod/color-coding)
   * Pushbutton [LINK](https://mods.factorio.com/mod/pushbutton)
-  * Whats a Spoilage [LINK](https://mods.factorio.com/mod/whats_a_spoilage)
-* the Factorio_Printer_v3.0 save file added to your local save directory. 
+* the Factorio_Printer_v3.1 save file added to your local save directory. 
 
 
 ## Usage
 
-There are three main user scripts contained:
+There are four main user scripts contained:
 
 * `create_sample_images.py`:
 
    This script reads the image located in `/image/Run`, applies image crop and size edits, and creates and outputs a set of JPGs of approximations of the original image, with a number of dithering methods used to apply palette colors to pixels. The outputs are put into `/image/Output`.
 
-   The script will first output an adjusted original image which shows the original image with vertical pixels halved, and image cropping editing applied but no color changes. Then, it will output one image for each combination of `dither_method` and `closeness_metric` called.
+   The script will first output an adjusted original image which shows the original image with vertical pixels halved, and image cropping editing applied but no color changes. Then, it will output one image for each `dither_method` called.
 
    Arguments:
-   * `dither_method = ['Blue Noise', 'Error Diffusion', 'Tetrahedral', 'Cubic', 'Octahedral', 'Dodecahedral', 'Nearest Color']`
+   * `dither = [Dither_Method.BLUE_NOISE, 
+          Dither_Method.ERR_DIFF_PER, 
+          Dither_Method.ERR_DIFF_FS, 
+          Dither_Method.POLY_4, 
+          Dither_Method.POLY_6, 
+          Dither_Method.POLY_8,
+          Dither_Method.POLY_12, 
+          Dither_Method.NEAREST]`
       
-      Supply one or a list of dither methods. Nearest Color applies nearest palette color without pre-dithering the pixels. Error Diffusion uses a 16-step periodic error diffusion algorithm to match colors. The rest use various methods of pre-shifting the colors at each point before matching nearest palette color.
+      Supply one or a list of Dither_Methods. `BLUE_NOISE` and `POLY_n` methods involve pre-shifting pixel values a defined amount before finding closest color. `ERR_DIFF_PER` is a 16-step periodic error diffusion algorithm. `ERR_DIFF_FS` is the Floyd-Steinberg error diffusion algorithm (slow on large images!). `NEAREST` applies nearest palette color without pre-dithering the pixels. 
 
-    * `closeness_metric = ['Euclidean', 'Non-Euclidean']`  
-       
-       Color proximity of palette colors to individual pixels is calculated using one of two metrics, applied on the RGB color space. Select one or the list to see variations of all images using both algorithms.
-       
-       Euclidean algorithm is the standard one: 
-       
-       `d_color = sqrt((r1 - r2)^2 + (g1 - g2)^2 + (b1 - b2)^2)`
-       
-       while the Non-Euclidean one is a very slight variation on one taken from https://www.compuphase.com/cmetric.htm: 
-       
-       `d_color = sqrt((2 + r_bar/256) * (r1 - r2)^2 + 4 *(g1 - g2)^2 + (2 + (256 - r_bar)/256) * (b1 - b2)^2)`
+    * `quality_icon = [Quality.LEGENDARY, Quality.EPIC, Quality.RARE, Quality.UNCOMMON, Quality.NORMAL, Quality.ALL]`
 
-       where
-
-       `r_bar = (r1 + r2) / 2`
-
-       **NOTE I have not confirmed that this metric  satisfies the triangle inequality.**
-
-    * `quality_icon = ['legendary', 'epic', 'rare', 'uncommon', 'normal', 'all']`
-
-       Adds a small quality icon to the image before processing. If a list is supplied, only the first will be used. `'normal'` will result in no icon added.
+       Adds a small quality icon to the image before processing. If a list is supplied, only the first will be used. NORMAL will result in no icon added.
 
     * `image_crop = 'None'`
        
        Can pass a tuple to crop the original image before any other processing. Tuple is `(left, upper, right, lower)` values, starting from `(0, 0)` as upper left-most pixel.
 
-    * `image_scale = ['fit', 'center', 'x2 center']`
+    * `image_scale = [Image_Scale.FIT, 
+                    Image_Scale.CENTER, 
+                    Image_Scale.X2_CENTER]`
 
-      * `'fit'` scales the image to largest size to fit within `(3000, 1440)`    
-      * `'center'` keeps original scale and crops if necessary to fit within `(3000, 1440)`
-      * `'x2 center'` doubles original scale and crops if necessary to fit within `(3000, 1440)`
+      * `FIT` scales the image to largest size to fit within `(3000, 1440)`    
+      * `CENTER` keeps original scale and crops if necessary to fit within `(3000, 1440)`
+      * `X2_CENTER` doubles original scale and crops if necessary to fit within `(3000, 1440)`
 
       image cropping happens before the editing. If a list is passed, only the first option is used in output images.
 
@@ -100,25 +98,50 @@ There are three main user scripts contained:
 
    **In Game:**
 
-   1. Open the Factorio_Printer_3.0 save in Factorio, with the required mods. Your default save location in windows can be found by navigating to `%appdata%` and from there opening `./Factorio/saves/` folder. On Linux, `~/.factorio/saves/`
+    1. Open the Factorio_Printer_3.0 save in Factorio, with the required mods. Your default save location in windows can be found by navigating to `%appdata%` and from there opening `./Factorio/saves/` folder. On Linux, `~/.factorio/saves/`
 
-   2. Open your map (default `m`) and zoom out until you can see the entire structure of the printer. You should see a box on the center left with "1: LOAD BP" written. Zoom in on the box and bank of combinators, but not so far that you leave map view.
+    2. Open your map (default `m`) and zoom out until you can see the entire structure of the printer. You should see a box on the center left with "LOAD" written. Zoom in on the box and bank of combinators, but not so far that you leave map view.
 
-   ![](./dat/images/bp_load_1.jpg)
+    ![](./dat/images/bp_load_1.jpg)
 
-   3. Alt+tab to `Blueprint Out/`, and drag the `.txt` file directly into the map. It may take a few seconds, but then the game should say 'Blueprint imported successfully' and you will be holding the blueprint. Click a spot in your quickbar to save the blueprint there and make Factorio the active screen. Note: you may need to place the game in windowed mode to do this, especially on a single screen.
+    3. Alt+tab to `Blueprint Out/`, and drag the `.txt` file directly into the map. It may take a few seconds, but then the game should say 'Blueprint imported successfully' and you will be holding the blueprint. Click a spot in your quickbar to save the blueprint there and make Factorio the active screen. Note: you may need to place the game in windowed mode to do this, especially on a single screen.
 
-   4. Align the blueprint with the block and click to place. **DO NOT FORCE BUILD**. There are four combinators on the interior corners that are rotated a different direction, and you can easily see if the blueprint is not aligned:
+    4. Align the blueprint with the block and click to place. **DO NOT FORCE BUILD**. There are four combinators on the interior corners that are rotated a different direction, and you can easily see if the blueprint is not aligned:
 
-   ![](./dat/images/bp_load_2.jpg)
+    ![](./dat/images/bp_load_2.jpg)
 
-   5. Move to the right until you see the outlined box that says '2: PUSH TO PRINT', and zoom in so that you can see the entities. Click the combinator, and click `On`. This is a pushbutton combinator, so it will immediately switch back off.
+    5. Move to the right, and zoom in to the center of the Star under 'Run', and click the pushbutton combinator and click 'on' (since it is a pushbutton, it will immediately turn back off)
 
-   ![](./dat/images/bp_load_3.jpg)
+    6. Exit the GUI for the combinator, and move to the right. The printer is now printing. If you leave map view, the in-person view is centered over a target shaped tag that corresponds to the approximate center of the image. You can see more of the image from in-person view, however the more of the print you are watching, the slower it will go. Each inserter is responsible for 600 pixels, and they move every 10 ticks, so this works out to 600 * (10 / 60) = 100 seconds of activity per inserter. Overall, a print should take ~120 seconds to finish, provided the game can run at 60 UPS.
 
-   6. Exit the GUI for the combinator, and move to the right. The printer is now printing. If you leave map view, the in-person view is centered over a target shaped tag that corresponds to the approximate center of the image. You can see more of the image from in-person view, however the more of the print you are watching, the slower it will go. Each inserter is responsible for 600 pixels, and they move every 10 ticks, so this works out to 600 * (10 / 60) = 100 seconds of activity per inserter. Overall, a print should take ~120 seconds to finish, provided the game can run at 60 UPS.
 
-   7. Making sure the in-person view is centered on the target, open the console with `~`, and run `/screenshot 6050 2925 0.25`. This will create a JPG screenshot of the image, which will get put into `script-output/` inside your Factorio folder.
+    7. Making sure the in-person view is centered on the target tag on the map, open the console with `~`, and run `/screenshot 6050 2925 0.25`. This will create a JPG screenshot of the image, which will get put into `script-output/` inside your Factorio folder.
+
+    
+    Here is a .gif of steps 1-6 (in-game):
+
+    ![](./dat/images/printer_operation.gif)
+
+* `create_tile_mosaic.py`
+  This script operates essentially the same as create_blueprint_from_images, but instead of creating a blueprint to be loaded into the Factorio Printer, it creates the image directly in tiles to be placed on the ground.
+
+  The arguments for `create_factorio_tile_image()` are the same as for `create_factorio_printer_image`, with these additions:
+  
+  * `image_final_size = None`
+
+  Tuple containing max width and heighth for the output to be cropped/scaled to fit within. If None, image size will be left alone. Recommend keeping images under (250,250).
+
+  * `background_color = (0, 0, 0)`
+
+  For images with transparency, such as some PNGs, this defines the color that is behind the transparent part of the image
+
+  * `print_transparent_tiles = False`
+
+  Include tiles in the output that represent full transparency in the original image. If True, output will always be a rectangle. If False, output will have shape of visible image.
+
+  Here is an example, with four versions of the Factorio gear logo at (128, 128) resolution, using Floyd-Steinberg dithering, black and white as background colors, and `print_transparent_tiles` toggled:
+
+  ![](./dat/images/transparency_example.jpg)
 
 * `image_crusher.py`
 
@@ -128,25 +151,30 @@ There are three main user scripts contained:
 
 ### Palette
 
-Palette colors were assigned by running full belts of items, taking a screenshot, and doing image analysis in R. The item sprites in game aren't very saturated, and liberal use is made of items within the Color Coding mod and Editor Extension mod to get more saturated colors, as well as using the Whats a Spoilage mod to turn off spoilage for some of the Gleba items.
+On the 3.0 version of the printer, palette colors were assigned by running full belts of items, taking a screenshot, and doing image analysis in R. The item sprites in game aren't very saturated, and liberal use is made of items within the Color Coding mod and Editor Extension mod to get more saturated colors, as well as using the Whats a Spoilage mod to turn off spoilage for some of the Gleba items.
 
-The resulting set of colors was better, but still not amazing. For example, the closest to white was around (215, 215, 215). I took the set of palette colors and adjusted them - brightening and saturating them, to give better color coverage. The downside to this is that printed images look very washed out compared to the original.
+Ever with extensive color correction, these colors just weren't bright enough. So I made a mod, [Technicolor Lab Tiles](https://mods.factorio.com/mod/tech-tiles) that creates items with exact colors.
 
-From here, I chose a black (black refined concrete) and white (space science pack), then from there iteratively found the palette color furthest from the existing set, and added it. (Distance with Euclidean metric). This was done 123 times, to get a palette of 125 items.
+The 125-color palette gives colors of the form (R, G, B) where R, G, and B are in {0, 64, 128, 192, 255}. This means nearest color no longer has to use the 3D Euclidean algorithm - the nearest palette color can be computed on each of the color bands. For instance, the pixel (175, 34, 90) has closest color: 175 is closer to 192 than 128, 34 is closer to 64 than 0, and 90 is closer to 64 than 128, so palette color (192, 64, 64) is closest. This works out to:
+`R_pal = (R_pix + 31) // 64 * 64` and so on, with 256 clipped to 255.
 
-The palette items and the adjusted color values I use for them are viewable in `dat/Final_Palette.csv`.
+#### Non-Euclidean Metric
 
-Here is the sample image included in the git repository:
+In version 3.0, I offered both Euclidean and Non-Euclidean Metric to calculate color distance, 
 
-![Charles and Brigger](./image/Sample.jpg)
+`d_color = sqrt((2 + r_bar/256) * (r1 - r2)^2 + 4 *(g1 - g2)^2 + (2 + (256 - r_bar)/256) * (b1 - b2)^2)`
 
-This image was run with `create_factorio_blueprint_from_image(dither_method = 'Blue Noise')` :
+where
 
-![Charles and Brigger](./dat/images/sample_print.jpg)
+`r_bar = (r1 + r2) / 2`
 
-Noticeably washed out. Here's the same image, run with `create_factorio_blueprint_from_image(dither_method = 'Blue Noise', image_color = 1.3, image_contrast = 1.5)`:
+Consider a pixel color, (r,g,b), and consider that g is between G1 and G2. If we think about a palette color (R, G1, B), and then the palette color (R, G2, B), the distances of these two palette colors from (r,g,b) varies only in G, that is whatever r_bar, dr, and db are, it's the same for both palette colors. Only dr changes between the two measurements, which means that of the two, whichever of (G1) and (G2) is closest to (g) will dictate which color point (R, G1, B) or (R, G2, B) is closest to (r, g, b).
 
-![Charles and Brigger](./dat/images/sample_print_saturated.jpg)
+This means that since we will always have equivalent points for any two G1 and G2, the closest palette color to a pixel will always minimize dg.
+
+Note that the same is true of db: if R is fixed, d_color is minimized by minimizing db.
+
+Thus, the only possible difference in the above metric is how R is handled, because of r_bar. In fact, the R values end up being approximately the same - 32 is closer to 0 than 64, but 33 isn't, so it's really just a rounding choice. For the 125 color palette at least, the Non-Euclidean Metric gives the same result. So I removed it.
 
 ### Non-square pixels
 
@@ -161,7 +189,7 @@ Belts in Factorio carry items on two sides, and the smallest singular unit of be
   +----+
 ```
 
-As a result, the image processing by necessity 'squashes' vertical pixels, combining adjacent pixels, before doing any dithering and color matching. The internal function `export_im_df` takes this into account, automatically doubling the height of the image before exporting. Note that the dimensions printed in the console and the description of the blueprint double the actual y pixels. Thus, the maximum print is 3000 x 720 = 2.16 megapixels, but this will show in the console and description as (3000, 1440). 
+As a result, the image processing by necessity 'squashes' vertical pixels, combining adjacent pixels, before doing any dithering and color matching. The internal function `export_im_df()` takes this into account, automatically doubling the height of the image before exporting. Note that the dimensions printed in the console and the description of the blueprint double the actual y pixels. Thus, the maximum print is 3000 x 720 = 2.16 megapixels, but this will show in the console and description as (3000, 1440). 
 
 
 ### Dithering
@@ -206,7 +234,7 @@ Within Factorio: every inserter operates on the same tick, no exceptions, every 
 
 Signals are passed through five selector combinators to split into each quality. Then, a selector combinator loops through the set of possible signals using `k // 4`, to pick which signal the given column should be expressing at that time. The result has the correct palette index read with appropriate amount of `// 125` and `% 125`, which is then aggregated * different powers of 2 and sent to the print block proper.
 
-Black (black refined concrete) is the color 0, as this allows black margins to be 'empty' combinators, saving on space. Similarly, if the set of four pixels for a signal are all blank, this item is filtered out of the signal list, so it won't take up space in the blueprint. Thus, small images run using `'fit'` settings will still print with 2.16 million pixels, but the size of the blueprint will be much smaller.
+Black (black refined concrete) is the color 0, as this allows black margins to be 'empty' combinators, saving on space. Similarly, if the set of four pixels for a signal are all blank, this item is filtered out of the signal list, so it won't take up space in the blueprint. Thus, small images run using `FIT` settings will still print with 2.16 million pixels, but the size of the blueprint will be much smaller.
 
 ### Future Plans
 
@@ -214,9 +242,7 @@ I've had my fill of trying to make a weird or very gray palette work for the pri
 
 Additional immediate goals with this project:
 
-* Optional arguments to change dithering amount
-* Create a working website that will create the blueprint .txt and preview images
-* Custom Factorio modding
+* Create a working website that will run create printer and/or tile mosaic images
 
 ## Contribution
 
